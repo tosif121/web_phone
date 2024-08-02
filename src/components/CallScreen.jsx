@@ -20,7 +20,19 @@ const CallScreen = ({
   const [isHovered, setIsHovered] = useState(false);
   const [showKeyPad, setShowKeyPad] = useState(false);
   const [muted, setMuted] = useState(false);
-
+  const debugDevices = async () => {
+    try {
+      await navigator.mediaDevices.getUserMedia({ audio: true });
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      console.log('All devices:', devices);
+      console.log(
+        'Audio input devices:',
+        devices.filter((device) => device.kind === 'audioinput')
+      );
+    } catch (error) {
+      console.error('Debug error:', error);
+    }
+  };
   const formatPhoneNumber = useFormatPhoneNumber();
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
@@ -80,12 +92,22 @@ const CallScreen = ({
         >
           <ImPhoneHangUp size={20} />
         </button>
-        <div>
-          <label htmlFor="audio-device">Audio Device:</label>
-          <select id="audio-device" value={selectedDeviceId} onChange={(e) => changeAudioDevice(e.target.value)}>
+        <button className="mt-4 px-4 py-2 bg-gray-200 text-gray-800 rounded" onClick={debugDevices}>
+          Debug Devices
+        </button>
+        <div className="w-full mt-4">
+          <label htmlFor="audio-device" className="block text-sm font-medium text-gray-700 mb-1">
+            Audio Device:
+          </label>
+          <select
+            id="audio-device"
+            value={selectedDeviceId}
+            onChange={(e) => changeAudioDevice(e.target.value)}
+            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+          >
             {devices.map((device) => (
               <option key={device.deviceId} value={device.deviceId}>
-                {device.label}
+                {device.label || `Audio device ${devices.indexOf(device) + 1}`}
               </option>
             ))}
           </select>

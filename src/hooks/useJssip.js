@@ -54,29 +54,21 @@ const useJssip = () => {
     mediaConstraints: { audio: true },
   };
 
-  const changeAudioDevice = (deviceId) => {
+  const changeAudioDevice = async (deviceId) => {
     setSelectedDeviceId(deviceId);
     if (session) {
-      // Update the audio input device for the current session
-      session.renegotiate({
-        mediaConstraints: { audio: { deviceId: { exact: deviceId } } }
-      });
-    }
-    // Update the audio output device
-    if (audioRef.current && typeof audioRef.current.setSinkId === 'function') {
-      audioRef.current.setSinkId(deviceId).catch((error) => console.error('Error setting sinkId:', error));
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: { deviceId: { exact: deviceId } }
+        });
+        session.connection.getSenders()[0].replaceTrack(stream.getAudioTracks()[0]);
+      } catch (error) {
+        console.error('Error changing audio device:', error);
+      }
     }
   };
 
   useEffect(() => {
-    navigator.mediaDevices.enumerateDevices().then((devices) => {
-      const audioDevices = devices.filter((device) => device.kind === 'audioinput' || device.kind === 'audiooutput');
-      setDevices(audioDevices);
-      if (audioDevices.length > 0) {
-        setSelectedDeviceId(audioDevices[0].deviceId);
-      }
-    });
-
     try {
       var socket = new JsSIP.WebSocketInterface('wss://awsdev.iotcom.io:8089/ws');
       var configuration = {
@@ -190,14 +182,32 @@ const useJssip = () => {
       navigate('/login');
     }
 
-    // Fetch available audio output devices
-    navigator.mediaDevices.enumerateDevices().then((devices) => {
-      const audioOutputDevices = devices.filter((device) => device.kind === 'audiooutput');
-      setDevices(audioOutputDevices);
-      if (audioOutputDevices.length > 0) {
-        setSelectedDeviceId(audioOutputDevices[0].deviceId);
+    const enumerateDevices = async () => {
+      try {
+        // Request permission for audio
+        await navigator.mediaDevices.getUserMedia({ audio: true });
+        
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const audioDevices = devices.filter(device => device.kind === 'audioinput');
+        setDevices(audioDevices);
+        
+        if (audioDevices.length > 0) {
+          setSelectedDeviceId(audioDevices[0].deviceId);
+        }
+      } catch (error) {
+        console.error('Error enumerating devices:', error);
       }
-    });
+    };
+
+    enumerateDevices();
+
+    // Re-enumerate devices when they change
+    navigator.mediaDevices.addEventListener('devicechange', enumerateDevices);
+
+    return () => {
+      navigator.mediaDevices.removeEventListener('devicechange', enumerateDevices);
+    };
+
   }, []);
 
   const handleCall = () => {

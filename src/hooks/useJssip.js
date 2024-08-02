@@ -54,7 +54,29 @@ const useJssip = () => {
     mediaConstraints: { audio: true },
   };
 
+  const changeAudioDevice = (deviceId) => {
+    setSelectedDeviceId(deviceId);
+    if (session) {
+      // Update the audio input device for the current session
+      session.renegotiate({
+        mediaConstraints: { audio: { deviceId: { exact: deviceId } } }
+      });
+    }
+    // Update the audio output device
+    if (audioRef.current && typeof audioRef.current.setSinkId === 'function') {
+      audioRef.current.setSinkId(deviceId).catch((error) => console.error('Error setting sinkId:', error));
+    }
+  };
+
   useEffect(() => {
+    navigator.mediaDevices.enumerateDevices().then((devices) => {
+      const audioDevices = devices.filter((device) => device.kind === 'audioinput' || device.kind === 'audiooutput');
+      setDevices(audioDevices);
+      if (audioDevices.length > 0) {
+        setSelectedDeviceId(audioDevices[0].deviceId);
+      }
+    });
+
     try {
       var socket = new JsSIP.WebSocketInterface('wss://awsdev.iotcom.io:8089/ws');
       var configuration = {
@@ -221,15 +243,13 @@ const useJssip = () => {
     setPhoneNumber,
     handleCall,
     session,
-    speakerOff,
-    setSpeakerOff,
     isRunning,
     audioRef,
     setStatus,
     setBridgeID,
     devices,
     selectedDeviceId,
-    changeAudioOutput,
+    changeAudioDevice,
   ];
 };
 

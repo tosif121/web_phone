@@ -6,7 +6,16 @@ import useFormatPhoneNumber from '../hooks/useFormatPhoneNumber';
 import { useState } from 'react';
 import KeyPad from './KeyPad';
 
-const CallScreen = ({ phoneNumber, session, speakerOff, setSpeakerOff, seconds, minutes, isRunning, devices, selectedDeviceId, changeAudioOutput }) => {
+const CallScreen = ({
+  phoneNumber,
+  session,
+  seconds,
+  minutes,
+  isRunning,
+  devices,
+  selectedDeviceId,
+  changeAudioDevice,
+}) => {
   const [currNum, setCurrNum] = useState('');
   const [isHovered, setIsHovered] = useState(false);
   const [showKeyPad, setShowKeyPad] = useState(false);
@@ -32,12 +41,6 @@ const CallScreen = ({ phoneNumber, session, speakerOff, setSpeakerOff, seconds, 
         <div className="w-full">
           {!showKeyPad ? (
             <div className="flex justify-around mb-6">
-              <button
-                className={`p-4 rounded-full ${speakerOff ? 'bg-blue-dark text-white' : 'text-gray-600'}`}
-                onClick={() => setSpeakerOff(!speakerOff)}
-              >
-                <IoVolumeMuteSharp className="text-3xl" />
-              </button>
               <button
                 className={`p-4 rounded-full ${muted ? 'bg-blue-dark text-white' : 'text-gray-600'}`}
                 onClick={() => {
@@ -78,12 +81,8 @@ const CallScreen = ({ phoneNumber, session, speakerOff, setSpeakerOff, seconds, 
           <ImPhoneHangUp size={20} />
         </button>
         <div>
-          <label htmlFor="audio-output">Audio Output:</label>
-          <select
-            id="audio-output"
-            value={selectedDeviceId}
-            onChange={(e) => changeAudioOutput(e.target.value)}
-          >
+          <label htmlFor="audio-device">Audio Device:</label>
+          <select id="audio-device" value={selectedDeviceId} onChange={(e) => changeAudioDevice(e.target.value)}>
             {devices.map((device) => (
               <option key={device.deviceId} value={device.deviceId}>
                 {device.label}

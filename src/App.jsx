@@ -15,15 +15,13 @@ function App() {
     setPhoneNumber,
     handleCall,
     session,
-    speakerOff,
-    setSpeakerOff,
     isRunning,
     audioRef,
     setStatus,
     setBridgeID,
     devices,
     selectedDeviceId,
-    changeAudioOutput,
+    changeAudioDevice,
   ] = useJssip();
   const [seeLogs, setSeeLogs] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
@@ -46,22 +44,18 @@ function App() {
         <CallScreen
           phoneNumber={phoneNumber}
           session={session}
-          speakerOff={speakerOff}
-          setSpeakerOff={setSpeakerOff}
           seconds={secondTime}
           minutes={minuteTime}
           isRunning={isRunning}
           setBridgeID={setBridgeID}
           devices={devices}
           selectedDeviceId={selectedDeviceId}
-          changeAudioOutput={changeAudioOutput}
+          changeAudioDevice={changeAudioDevice}
         />
       ) : status === 'Incalling' ? (
         <InCallScreen
           phoneNumber={phoneNumber}
           session={session}
-          speakerOff={speakerOff}
-          setSpeakerOff={setSpeakerOff}
           setPhoneNumber={setPhoneNumber}
           seconds={secondTime}
           minutes={minuteTime}
@@ -70,12 +64,11 @@ function App() {
           audioRef={audioRef}
           devices={devices}
           selectedDeviceId={selectedDeviceId}
-          changeAudioOutput={changeAudioOutput}
         />
       ) : (
         <div>Nothing</div>
       )}
-      <audio ref={audioRef} autoPlay hidden={true} muted={speakerOff} />
+      <audio ref={audioRef} autoPlay hidden={true} />
     </div>
   );
 }

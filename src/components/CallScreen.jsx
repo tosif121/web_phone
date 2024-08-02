@@ -1,6 +1,6 @@
 import { BsPersonFill, BsMicMute } from 'react-icons/bs';
 import { IoIosKeypad } from 'react-icons/io';
-import { IoCloseCircleOutline, IoCloseCircle, IoVolumeMuteSharp } from 'react-icons/io5';
+import { IoCloseCircleOutline, IoCloseCircle } from 'react-icons/io5';
 import { ImPhoneHangUp } from 'react-icons/im';
 import useFormatPhoneNumber from '../hooks/useFormatPhoneNumber';
 import { useState } from 'react';
@@ -91,9 +91,6 @@ const CallScreen = ({
           }}
         >
           <ImPhoneHangUp size={20} />
-        </button>
-        <button className="mt-4 px-4 py-2 bg-gray-200 text-gray-800 rounded" onClick={debugDevices}>
-          Debug Devices
         </button>
         <div className="w-full mt-4">
           <label htmlFor="audio-device" className="block text-sm font-medium text-gray-700 mb-1">
